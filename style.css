@@ -128,9 +128,24 @@ button:focus-visible {
   color: var(--warna-redup);
 }
 
+.aksi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
 .nominal {
   font-weight: bold;
   white-space: nowrap;
+}
+
+.tombol-hapus {
+  padding: 0.125rem 0.5rem;
+  font-size: 0.875rem;
+  background-color: transparent;
+  color: var(--warna-bahaya);
+  border-color: var(--warna-bahaya);
 }
 
 .pemasukan .nominal {

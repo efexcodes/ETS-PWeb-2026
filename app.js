@@ -56,8 +56,19 @@ function buatItemTransaksi(item) {
   const tanda = item.jenis === "pemasukan" ? "+" : "-";
   nominal.textContent = `${tanda} ${formatRupiah(item.nominal)}`;
 
+  const tombolHapus = document.createElement("button");
+  tombolHapus.type = "button";
+  tombolHapus.className = "tombol-hapus";
+  tombolHapus.dataset.id = item.id;
+  tombolHapus.textContent = "Hapus";
+
+  const aksi = document.createElement("div");
+  aksi.className = "aksi";
+  aksi.appendChild(nominal);
+  aksi.appendChild(tombolHapus);
+
   li.appendChild(info);
-  li.appendChild(nominal);
+  li.appendChild(aksi);
   return li;
 }
 
@@ -86,6 +97,21 @@ function tambahTransaksi(item) {
   renderDaftar(state);
   pesan.textContent = "Transaksi berhasil ditambahkan.";
 }
+
+function hapusTransaksi(id) {
+  state.transaksi = state.transaksi.filter((item) => item.id !== id);
+  renderDaftar(state);
+  pesan.textContent = "Transaksi dihapus.";
+}
+
+daftarTransaksi.addEventListener("click", (event) => {
+  const tombol = event.target.closest(".tombol-hapus");
+  if (!tombol) return;
+
+  if (confirm("Yakin ingin menghapus transaksi ini?")) {
+    hapusTransaksi(Number(tombol.dataset.id));
+  }
+});
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
