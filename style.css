@@ -78,7 +78,6 @@ button {
 
 input[type="number"] {
   appearance: textfield;
-  -moz-appearance: textfield;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
@@ -174,8 +173,17 @@ button:focus-visible {
 }
 
 .item-budget {
+  --warna-status: var(--warna-sukses);
   padding: 0.75rem 0;
   border-top: 1px solid var(--warna-garis);
+}
+
+.item-budget.dekat {
+  --warna-status: var(--warna-waspada);
+}
+
+.item-budget.lewat {
+  --warna-status: var(--warna-bahaya);
 }
 
 .judul-budget {
@@ -186,37 +194,13 @@ button:focus-visible {
 
 .item-budget progress {
   width: 100%;
-  accent-color: var(--warna-sukses);
+  accent-color: var(--warna-status);
 }
 
 .status-budget {
   margin: 0;
   font-weight: bold;
-  color: var(--warna-sukses);
-}
-
-.item-budget.dekat progress {
-  accent-color: var(--warna-waspada);
-}
-
-.item-budget.dekat .status-budget {
-  color: var(--warna-waspada);
-}
-
-.item-budget.lewat progress {
-  accent-color: var(--warna-bahaya);
-}
-
-.item-budget.lewat .status-budget {
-  color: var(--warna-bahaya);
-}
-
-.tombol-hapus-budget {
-  padding: 0.125rem 0.5rem;
-  font-size: 0.875rem;
-  background-color: transparent;
-  color: var(--warna-bahaya);
-  border-color: var(--warna-bahaya);
+  color: var(--warna-status);
 }
 
 .filter {
@@ -230,8 +214,8 @@ button:focus-visible {
   margin-bottom: 0;
 }
 
-.filter .baris-form:last-child {
-  justify-content: flex-end;
+.filter button {
+  align-self: end;
 }
 
 #daftar-transaksi {
@@ -251,6 +235,11 @@ button:focus-visible {
 
 .item-transaksi:last-child {
   border-bottom: none;
+}
+
+.info-transaksi {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .detail {
@@ -317,21 +306,31 @@ button:focus-visible {
   color: var(--warna-redup);
 }
 
-#daftar-error {
-  margin: 0.5rem 0 0;
-  padding-left: 1.25rem;
-  color: var(--warna-bahaya);
-}
-
-#daftar-error:empty {
-  display: none;
-}
-
+#pesan,
 #pesan-backup {
   margin: 0.5rem 0 0;
 }
 
 #pesan {
-  margin: 0.5rem 0 0;
   color: var(--warna-sukses);
+}
+
+@media (max-width: 30rem) {
+  header,
+  main {
+    padding: 0.75rem;
+  }
+
+  .kartu {
+    padding: 0.75rem;
+  }
+
+  .ringkasan {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  .ringkasan .kartu:last-child {
+    grid-column: 1 / -1;
+  }
 }

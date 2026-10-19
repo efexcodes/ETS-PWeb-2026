@@ -124,7 +124,7 @@
           <button type="submit" id="tombol-simpan">Simpan</button>
           <button type="button" id="tombol-batal" hidden>Batal</button>
         </div>
-        <ul id="daftar-error" role="alert"></ul>
+        <p class="teks-error" id="error-transaksi" role="alert"></p>
         <p id="pesan" role="status"></p>
       </form>
     </section>
@@ -164,9 +164,7 @@
           <input type="search" id="filter-kata" placeholder="Kata kunci">
         </div>
 
-        <div class="baris-form">
-          <button type="button" id="tombol-reset-filter">Reset Filter</button>
-        </div>
+        <button type="button" id="tombol-reset-filter">Reset Filter</button>
       </form>
 
       <ul id="daftar-transaksi"></ul>
