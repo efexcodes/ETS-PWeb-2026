@@ -11,6 +11,7 @@ const inputKategori = document.querySelector("#kategori");
 const inputNominal = document.querySelector("#nominal");
 const inputCatatan = document.querySelector("#catatan");
 const pesan = document.querySelector("#pesan");
+const daftarError = document.querySelector("#daftar-error");
 const daftarTransaksi = document.querySelector("#daftar-transaksi");
 const teksPemasukan = document.querySelector("#total-pemasukan");
 const teksPengeluaran = document.querySelector("#total-pengeluaran");
@@ -160,6 +161,30 @@ daftarTransaksi.addEventListener("click", (event) => {
   }
 });
 
+function validasiTransaksi(item) {
+  const daftarPesan = [];
+
+  if (!item.tanggal) {
+    daftarPesan.push("Tanggal wajib diisi.");
+  }
+
+  if (Number.isNaN(item.nominal) || item.nominal <= 0) {
+    daftarPesan.push("Nominal wajib diisi dan harus lebih dari 0.");
+  }
+
+  return daftarPesan;
+}
+
+function tampilkanError(daftarPesan) {
+  daftarError.innerHTML = "";
+
+  for (const teks of daftarPesan) {
+    const li = document.createElement("li");
+    li.textContent = teks;
+    daftarError.appendChild(li);
+  }
+}
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -171,6 +196,14 @@ form.addEventListener("submit", (event) => {
     nominal: Number(inputNominal.value),
     catatan: inputCatatan.value.trim()
   };
+
+  const daftarPesan = validasiTransaksi(transaksiBaru);
+  tampilkanError(daftarPesan);
+
+  if (daftarPesan.length > 0) {
+    pesan.textContent = "";
+    return;
+  }
 
   tambahTransaksi(transaksiBaru);
   kosongkanForm();

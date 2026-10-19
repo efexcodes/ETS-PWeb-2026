@@ -30,10 +30,10 @@
 
     <section class="kartu">
       <h2>Tambah Transaksi</h2>
-      <form id="form-transaksi">
+      <form id="form-transaksi" novalidate>
         <div class="baris-form">
           <label for="tanggal">Tanggal</label>
-          <input type="date" id="tanggal" required>
+          <input type="date" id="tanggal">
         </div>
 
         <div class="baris-form">
@@ -59,7 +59,7 @@
 
         <div class="baris-form">
           <label for="nominal">Nominal (Rp)</label>
-          <input type="number" id="nominal" required>
+          <input type="number" id="nominal">
         </div>
 
         <div class="baris-form">
@@ -68,6 +68,7 @@
         </div>
 
         <button type="submit">Simpan</button>
+        <ul id="daftar-error" role="alert"></ul>
         <p id="pesan" role="status"></p>
       </form>
     </section>
