@@ -6,6 +6,7 @@
   --warna-garis: #d5dbe0;
   --warna-sukses: #1b7a43;
   --warna-bahaya: #c0392b;
+  --warna-waspada: #b7791f;
   --warna-redup: #66727f;
 }
 
@@ -164,6 +165,58 @@ button:focus-visible {
 
 .peringatan:empty {
   display: none;
+}
+
+#daftar-budget {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+}
+
+.item-budget {
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--warna-garis);
+}
+
+.judul-budget {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-budget progress {
+  width: 100%;
+  accent-color: var(--warna-sukses);
+}
+
+.status-budget {
+  margin: 0;
+  font-weight: bold;
+  color: var(--warna-sukses);
+}
+
+.item-budget.dekat progress {
+  accent-color: var(--warna-waspada);
+}
+
+.item-budget.dekat .status-budget {
+  color: var(--warna-waspada);
+}
+
+.item-budget.lewat progress {
+  accent-color: var(--warna-bahaya);
+}
+
+.item-budget.lewat .status-budget {
+  color: var(--warna-bahaya);
+}
+
+.tombol-hapus-budget {
+  padding: 0.125rem 0.5rem;
+  font-size: 0.875rem;
+  background-color: transparent;
+  color: var(--warna-bahaya);
+  border-color: var(--warna-bahaya);
 }
 
 .filter {

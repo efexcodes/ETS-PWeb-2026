@@ -1,9 +1,11 @@
 const KUNCI_TRANSAKSI = "transaksi";
 const KUNCI_UANG_BULANAN = "uangBulanan";
+const KUNCI_BUDGET = "budget";
 
 let state = {
   transaksi: [],
   uangBulanan: 0,
+  budget: {},
   idEdit: null,
   filter: { jenis: "semua", kategori: "semua", dari: "", sampai: "", kata: "" }
 };
@@ -21,6 +23,11 @@ const filterDari = document.querySelector("#filter-dari");
 const filterSampai = document.querySelector("#filter-sampai");
 const filterKata = document.querySelector("#filter-kata");
 const tombolResetFilter = document.querySelector("#tombol-reset-filter");
+const formBudget = document.querySelector("#form-budget");
+const budgetKategori = document.querySelector("#budget-kategori");
+const budgetBatas = document.querySelector("#budget-batas");
+const errorBudget = document.querySelector("#error-budget");
+const daftarBudget = document.querySelector("#daftar-budget");
 const judulForm = document.querySelector("#judul-form");
 const tombolSimpan = document.querySelector("#tombol-simpan");
 const tombolBatal = document.querySelector("#tombol-batal");
@@ -42,6 +49,15 @@ const teksPeringatan = document.querySelector("#peringatan");
 function simpanData() {
   localStorage.setItem(KUNCI_TRANSAKSI, JSON.stringify(state.transaksi));
   localStorage.setItem(KUNCI_UANG_BULANAN, String(state.uangBulanan));
+  localStorage.setItem(KUNCI_BUDGET, JSON.stringify(state.budget));
+}
+
+function bacaJson(kunci) {
+  try {
+    return JSON.parse(localStorage.getItem(kunci));
+  } catch (error) {
+    return null;
+  }
 }
 
 function muatData() {
@@ -50,13 +66,14 @@ function muatData() {
     state.uangBulanan = uang;
   }
 
-  try {
-    const data = JSON.parse(localStorage.getItem(KUNCI_TRANSAKSI));
-    if (Array.isArray(data)) {
-      state.transaksi = data;
-    }
-  } catch (error) {
-    state.transaksi = [];
+  const transaksi = bacaJson(KUNCI_TRANSAKSI);
+  if (Array.isArray(transaksi)) {
+    state.transaksi = transaksi;
+  }
+
+  const budget = bacaJson(KUNCI_BUDGET);
+  if (budget && typeof budget === "object" && !Array.isArray(budget)) {
+    state.budget = budget;
   }
 }
 
@@ -229,9 +246,89 @@ function renderJatah(data) {
   }
 }
 
+function hitungBudget(data) {
+  const bulanIni = hariIni().slice(0, 7);
+
+  return Object.keys(data.budget).map((kategori) => {
+    const batas = data.budget[kategori];
+    const terpakai = data.transaksi
+      .filter((item) => {
+        return item.jenis === "pengeluaran" && item.kategori === kategori && item.tanggal.slice(0, 7) === bulanIni;
+      })
+      .reduce((total, item) => total + item.nominal, 0);
+
+    let status = "aman";
+    if (terpakai > batas) {
+      status = "lewat";
+    } else if (terpakai >= batas * 0.8) {
+      status = "dekat";
+    }
+
+    return { kategori, batas, terpakai, persen: Math.round((terpakai / batas) * 100), status };
+  });
+}
+
+function renderBudget(data) {
+  daftarBudget.innerHTML = "";
+
+  const daftar = hitungBudget(data);
+  if (daftar.length === 0) {
+    const kosong = document.createElement("li");
+    kosong.className = "kosong";
+    kosong.textContent = "Belum ada budget.";
+    daftarBudget.appendChild(kosong);
+    return;
+  }
+
+  const teksStatus = {
+    aman: "Masih aman.",
+    dekat: "Mendekati batas!",
+    lewat: "Melewati batas!"
+  };
+
+  for (const budget of daftar) {
+    const li = document.createElement("li");
+    li.className = `item-budget ${budget.status}`;
+
+    const judul = document.createElement("div");
+    judul.className = "judul-budget";
+
+    const nama = document.createElement("strong");
+    nama.textContent = budget.kategori;
+
+    const tombolHapus = document.createElement("button");
+    tombolHapus.type = "button";
+    tombolHapus.className = "tombol-hapus-budget";
+    tombolHapus.dataset.kategori = budget.kategori;
+    tombolHapus.textContent = "Hapus";
+
+    judul.appendChild(nama);
+    judul.appendChild(tombolHapus);
+
+    const bar = document.createElement("progress");
+    bar.max = budget.batas;
+    bar.value = budget.terpakai;
+
+    const rincian = document.createElement("p");
+    rincian.className = "detail";
+    rincian.textContent = `${formatRupiah(budget.terpakai)} dari ${formatRupiah(budget.batas)} (${budget.persen}%)`;
+
+    const status = document.createElement("p");
+    status.className = "status-budget";
+    status.textContent = teksStatus[budget.status];
+
+    li.appendChild(judul);
+    li.appendChild(bar);
+    li.appendChild(rincian);
+    li.appendChild(status);
+    daftarBudget.appendChild(li);
+  }
+}
+
 function render(data) {
   renderRingkasan(data);
   renderJatah(data);
+  renderBudget(data);
   renderDaftar(data);
 }
 
@@ -309,14 +406,39 @@ tombolBatal.addEventListener("click", () => {
   pesan.textContent = "";
 });
 
-function isiOpsiFilterKategori() {
+function isiOpsiKategori(pilihan) {
   for (const opsi of inputKategori.options) {
     const salinan = document.createElement("option");
     salinan.value = opsi.value;
     salinan.textContent = opsi.textContent;
-    filterKategori.appendChild(salinan);
+    pilihan.appendChild(salinan);
   }
 }
+
+formBudget.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const batas = Number(budgetBatas.value);
+  if (Number.isNaN(batas) || batas <= 0) {
+    errorBudget.textContent = "Batas budget wajib diisi dan harus lebih dari 0.";
+    return;
+  }
+
+  errorBudget.textContent = "";
+  state.budget[budgetKategori.value] = batas;
+  simpanData();
+  render(state);
+  budgetBatas.value = "";
+});
+
+daftarBudget.addEventListener("click", (event) => {
+  const tombol = event.target.closest(".tombol-hapus-budget");
+  if (!tombol) return;
+
+  delete state.budget[tombol.dataset.kategori];
+  simpanData();
+  render(state);
+});
 
 function bacaFilter() {
   state.filter = {
@@ -404,7 +526,8 @@ form.addEventListener("submit", (event) => {
 });
 
 muatData();
-isiOpsiFilterKategori();
+isiOpsiKategori(filterKategori);
+isiOpsiKategori(budgetKategori);
 inputUangBulanan.value = state.uangBulanan > 0 ? state.uangBulanan : "";
 kosongkanForm();
 render(state);

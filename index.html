@@ -62,6 +62,26 @@
     </section>
 
     <section class="kartu">
+      <h2>Budget per Kategori</h2>
+      <form id="form-budget" novalidate>
+        <div class="baris-form">
+          <label for="budget-kategori">Kategori</label>
+          <select id="budget-kategori"></select>
+        </div>
+
+        <div class="baris-form">
+          <label for="budget-batas">Batas per bulan (Rp)</label>
+          <input type="number" id="budget-batas">
+        </div>
+
+        <button type="submit">Simpan Budget</button>
+        <p class="teks-error" id="error-budget" role="alert"></p>
+      </form>
+
+      <ul id="daftar-budget"></ul>
+    </section>
+
+    <section class="kartu">
       <h2 id="judul-form">Tambah Transaksi</h2>
       <form id="form-transaksi" novalidate>
         <div class="baris-form">
