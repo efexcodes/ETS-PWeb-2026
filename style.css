@@ -203,12 +203,37 @@ button:focus-visible {
   white-space: nowrap;
 }
 
+.tombol-aksi {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.tombol-edit,
 .tombol-hapus {
   padding: 0.125rem 0.5rem;
   font-size: 0.875rem;
   background-color: transparent;
+}
+
+.tombol-edit {
+  color: var(--warna-utama);
+  border-color: var(--warna-utama);
+}
+
+.tombol-hapus {
   color: var(--warna-bahaya);
   border-color: var(--warna-bahaya);
+}
+
+.tombol-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+#tombol-batal {
+  background-color: transparent;
+  color: var(--warna-teks);
+  border-color: var(--warna-garis);
 }
 
 .pemasukan .nominal {

@@ -62,7 +62,7 @@
     </section>
 
     <section class="kartu">
-      <h2>Tambah Transaksi</h2>
+      <h2 id="judul-form">Tambah Transaksi</h2>
       <form id="form-transaksi" novalidate>
         <div class="baris-form">
           <label for="tanggal">Tanggal</label>
@@ -100,7 +100,10 @@
           <input type="text" id="catatan">
         </div>
 
-        <button type="submit">Simpan</button>
+        <div class="tombol-form">
+          <button type="submit" id="tombol-simpan">Simpan</button>
+          <button type="button" id="tombol-batal" hidden>Batal</button>
+        </div>
         <ul id="daftar-error" role="alert"></ul>
         <p id="pesan" role="status"></p>
       </form>

@@ -3,7 +3,8 @@ const KUNCI_UANG_BULANAN = "uangBulanan";
 
 let state = {
   transaksi: [],
-  uangBulanan: 0
+  uangBulanan: 0,
+  idEdit: null
 };
 
 const form = document.querySelector("#form-transaksi");
@@ -12,6 +13,9 @@ const inputJenis = document.querySelector("#jenis");
 const inputKategori = document.querySelector("#kategori");
 const inputNominal = document.querySelector("#nominal");
 const inputCatatan = document.querySelector("#catatan");
+const judulForm = document.querySelector("#judul-form");
+const tombolSimpan = document.querySelector("#tombol-simpan");
+const tombolBatal = document.querySelector("#tombol-batal");
 const pesan = document.querySelector("#pesan");
 const daftarError = document.querySelector("#daftar-error");
 const daftarTransaksi = document.querySelector("#daftar-transaksi");
@@ -93,16 +97,27 @@ function buatItemTransaksi(item) {
   const tanda = item.jenis === "pemasukan" ? "+" : "-";
   nominal.textContent = `${tanda} ${formatRupiah(item.nominal)}`;
 
+  const tombolEdit = document.createElement("button");
+  tombolEdit.type = "button";
+  tombolEdit.className = "tombol-edit";
+  tombolEdit.dataset.id = item.id;
+  tombolEdit.textContent = "Edit";
+
   const tombolHapus = document.createElement("button");
   tombolHapus.type = "button";
   tombolHapus.className = "tombol-hapus";
   tombolHapus.dataset.id = item.id;
   tombolHapus.textContent = "Hapus";
 
+  const tombolAksi = document.createElement("div");
+  tombolAksi.className = "tombol-aksi";
+  tombolAksi.appendChild(tombolEdit);
+  tombolAksi.appendChild(tombolHapus);
+
   const aksi = document.createElement("div");
   aksi.className = "aksi";
   aksi.appendChild(nominal);
-  aksi.appendChild(tombolHapus);
+  aksi.appendChild(tombolAksi);
 
   li.appendChild(info);
   li.appendChild(aksi);
@@ -208,18 +223,69 @@ function tambahTransaksi(item) {
 
 function hapusTransaksi(id) {
   state.transaksi = state.transaksi.filter((item) => item.id !== id);
+  if (state.idEdit === id) {
+    selesaiEdit();
+  }
   simpanData();
   render(state);
   pesan.textContent = "Transaksi dihapus.";
 }
 
-daftarTransaksi.addEventListener("click", (event) => {
-  const tombol = event.target.closest(".tombol-hapus");
-  if (!tombol) return;
+function ubahTransaksi(id, dataBaru) {
+  dataBaru.id = id;
+  state.transaksi = state.transaksi.map((item) => (item.id === id ? dataBaru : item));
+  simpanData();
+  render(state);
+  selesaiEdit();
+  pesan.textContent = "Transaksi berhasil diubah.";
+}
 
-  if (confirm("Yakin ingin menghapus transaksi ini?")) {
-    hapusTransaksi(Number(tombol.dataset.id));
+function mulaiEdit(id) {
+  const item = state.transaksi.find((transaksi) => transaksi.id === id);
+  if (!item) return;
+
+  state.idEdit = id;
+  inputTanggal.value = item.tanggal;
+  inputJenis.value = item.jenis;
+  inputKategori.value = item.kategori;
+  inputNominal.value = item.nominal;
+  inputCatatan.value = item.catatan;
+
+  judulForm.textContent = "Edit Transaksi";
+  tombolSimpan.textContent = "Simpan Perubahan";
+  tombolBatal.hidden = false;
+  tampilkanError([]);
+  pesan.textContent = "";
+  form.scrollIntoView({ behavior: "smooth" });
+}
+
+function selesaiEdit() {
+  state.idEdit = null;
+  kosongkanForm();
+  judulForm.textContent = "Tambah Transaksi";
+  tombolSimpan.textContent = "Simpan";
+  tombolBatal.hidden = true;
+  tampilkanError([]);
+}
+
+daftarTransaksi.addEventListener("click", (event) => {
+  const tombolHapus = event.target.closest(".tombol-hapus");
+  if (tombolHapus) {
+    if (confirm("Yakin ingin menghapus transaksi ini?")) {
+      hapusTransaksi(Number(tombolHapus.dataset.id));
+    }
+    return;
   }
+
+  const tombolEdit = event.target.closest(".tombol-edit");
+  if (tombolEdit) {
+    mulaiEdit(Number(tombolEdit.dataset.id));
+  }
+});
+
+tombolBatal.addEventListener("click", () => {
+  selesaiEdit();
+  pesan.textContent = "";
 });
 
 function validasiTransaksi(item) {
@@ -281,8 +347,12 @@ form.addEventListener("submit", (event) => {
     return;
   }
 
-  tambahTransaksi(transaksiBaru);
-  kosongkanForm();
+  if (state.idEdit === null) {
+    tambahTransaksi(transaksiBaru);
+    kosongkanForm();
+  } else {
+    ubahTransaksi(state.idEdit, transaksiBaru);
+  }
 });
 
 muatData();
