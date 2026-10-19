@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uang Kos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Uang Kos</h1>
+    <p>Catat uang bulanan supaya tidak habis sebelum akhir bulan.</p>
+  </header>
+
+  <main>
+    <section class="kartu">
+      <h2>Tambah Transaksi</h2>
+      <form id="form-transaksi">
+        <div class="baris-form">
+          <label for="tanggal">Tanggal</label>
+          <input type="date" id="tanggal" required>
+        </div>
+
+        <div class="baris-form">
+          <label for="jenis">Jenis</label>
+          <select id="jenis">
+            <option value="pengeluaran">Pengeluaran</option>
+            <option value="pemasukan">Pemasukan</option>
+          </select>
+        </div>
+
+        <div class="baris-form">
+          <label for="kategori">Kategori</label>
+          <select id="kategori">
+            <option value="Makan">Makan</option>
+            <option value="Transportasi">Transportasi</option>
+            <option value="Tagihan">Tagihan</option>
+            <option value="Belanja">Belanja</option>
+            <option value="Hiburan">Hiburan</option>
+            <option value="Uang Saku">Uang Saku</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <div class="baris-form">
+          <label for="nominal">Nominal (Rp)</label>
+          <input type="number" id="nominal" required>
+        </div>
+
+        <div class="baris-form">
+          <label for="catatan">Catatan (opsional)</label>
+          <input type="text" id="catatan">
+        </div>
+
+        <button type="submit">Simpan</button>
+        <p id="pesan" role="status"></p>
+      </form>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
