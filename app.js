@@ -1,7 +1,9 @@
 const KUNCI_TRANSAKSI = "transaksi";
+const KUNCI_UANG_BULANAN = "uangBulanan";
 
 let state = {
-  transaksi: []
+  transaksi: [],
+  uangBulanan: 0
 };
 
 const form = document.querySelector("#form-transaksi");
@@ -16,12 +18,26 @@ const daftarTransaksi = document.querySelector("#daftar-transaksi");
 const teksPemasukan = document.querySelector("#total-pemasukan");
 const teksPengeluaran = document.querySelector("#total-pengeluaran");
 const teksSaldo = document.querySelector("#saldo");
+const formUang = document.querySelector("#form-uang");
+const inputUangBulanan = document.querySelector("#uang-bulanan");
+const errorUang = document.querySelector("#error-uang");
+const teksSisaUang = document.querySelector("#sisa-uang");
+const teksSisaHari = document.querySelector("#sisa-hari");
+const teksJatahHarian = document.querySelector("#jatah-harian");
+const teksPengeluaranHariIni = document.querySelector("#pengeluaran-hari-ini");
+const teksPeringatan = document.querySelector("#peringatan");
 
 function simpanData() {
   localStorage.setItem(KUNCI_TRANSAKSI, JSON.stringify(state.transaksi));
+  localStorage.setItem(KUNCI_UANG_BULANAN, String(state.uangBulanan));
 }
 
 function muatData() {
+  const uang = Number(localStorage.getItem(KUNCI_UANG_BULANAN));
+  if (uang > 0) {
+    state.uangBulanan = uang;
+  }
+
   try {
     const data = JSON.parse(localStorage.getItem(KUNCI_TRANSAKSI));
     if (Array.isArray(data)) {
@@ -133,8 +149,53 @@ function renderRingkasan(data) {
   teksSaldo.classList.toggle("negatif", ringkasan.saldo < 0);
 }
 
+function hitungJatahHarian(data) {
+  const sekarang = new Date();
+  const tanggalHariIni = hariIni();
+  const bulanIni = tanggalHariIni.slice(0, 7);
+
+  const jumlahHariBulanIni = new Date(sekarang.getFullYear(), sekarang.getMonth() + 1, 0).getDate();
+  const sisaHari = jumlahHariBulanIni - sekarang.getDate() + 1;
+
+  const pengeluaranBulanIni = data.transaksi
+    .filter((item) => item.jenis === "pengeluaran" && item.tanggal.slice(0, 7) === bulanIni)
+    .reduce((total, item) => total + item.nominal, 0);
+
+  const pengeluaranHariIni = data.transaksi
+    .filter((item) => item.jenis === "pengeluaran" && item.tanggal === tanggalHariIni)
+    .reduce((total, item) => total + item.nominal, 0);
+
+  const sisaUang = data.uangBulanan - pengeluaranBulanIni;
+  const sisaUangAwalHari = sisaUang + pengeluaranHariIni;
+  const jatah = Math.floor(Math.max(sisaUangAwalHari, 0) / sisaHari);
+
+  return {
+    sisaUang,
+    sisaHari,
+    jatah,
+    pengeluaranHariIni,
+    melebihi: data.uangBulanan > 0 && pengeluaranHariIni > jatah
+  };
+}
+
+function renderJatah(data) {
+  const jatah = hitungJatahHarian(data);
+
+  teksSisaUang.textContent = formatRupiah(jatah.sisaUang);
+  teksSisaHari.textContent = `${jatah.sisaHari} hari`;
+  teksJatahHarian.textContent = formatRupiah(jatah.jatah);
+  teksPengeluaranHariIni.textContent = formatRupiah(jatah.pengeluaranHariIni);
+
+  if (jatah.melebihi) {
+    teksPeringatan.textContent = `Awas! Pengeluaran hari ini (${formatRupiah(jatah.pengeluaranHariIni)}) melebihi jatah harian (${formatRupiah(jatah.jatah)}).`;
+  } else {
+    teksPeringatan.textContent = "";
+  }
+}
+
 function render(data) {
   renderRingkasan(data);
+  renderJatah(data);
   renderDaftar(data);
 }
 
@@ -185,6 +246,21 @@ function tampilkanError(daftarPesan) {
   }
 }
 
+formUang.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  const uang = Number(inputUangBulanan.value);
+  if (Number.isNaN(uang) || uang <= 0) {
+    errorUang.textContent = "Uang bulanan wajib diisi dan harus lebih dari 0.";
+    return;
+  }
+
+  errorUang.textContent = "";
+  state.uangBulanan = uang;
+  simpanData();
+  render(state);
+});
+
 form.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -210,5 +286,6 @@ form.addEventListener("submit", (event) => {
 });
 
 muatData();
+inputUangBulanan.value = state.uangBulanan > 0 ? state.uangBulanan : "";
 kosongkanForm();
 render(state);
