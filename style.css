@@ -5,6 +5,8 @@
   --warna-utama: #2f6f5e;
   --warna-garis: #d5dbe0;
   --warna-sukses: #1b7a43;
+  --warna-bahaya: #c0392b;
+  --warna-redup: #66727f;
 }
 
 * {
@@ -99,6 +101,48 @@ input:focus-visible,
 select:focus-visible,
 button:focus-visible {
   outline: 3px solid #a7beae;
+}
+
+#daftar-transaksi {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item-transaksi {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--warna-garis);
+}
+
+.item-transaksi:last-child {
+  border-bottom: none;
+}
+
+.detail {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--warna-redup);
+}
+
+.nominal {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.pemasukan .nominal {
+  color: var(--warna-sukses);
+}
+
+.pengeluaran .nominal {
+  color: var(--warna-bahaya);
+}
+
+.kosong {
+  color: var(--warna-redup);
 }
 
 #pesan {
