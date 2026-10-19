@@ -327,6 +327,10 @@ button:focus-visible {
   display: none;
 }
 
+#pesan-backup {
+  margin: 0.5rem 0 0;
+}
+
 #pesan {
   margin: 0.5rem 0 0;
   color: var(--warna-sukses);

@@ -23,6 +23,9 @@ const filterDari = document.querySelector("#filter-dari");
 const filterSampai = document.querySelector("#filter-sampai");
 const filterKata = document.querySelector("#filter-kata");
 const tombolResetFilter = document.querySelector("#tombol-reset-filter");
+const tombolEkspor = document.querySelector("#tombol-ekspor");
+const fileImpor = document.querySelector("#file-impor");
+const pesanBackup = document.querySelector("#pesan-backup");
 const formBudget = document.querySelector("#form-budget");
 const budgetKategori = document.querySelector("#budget-kategori");
 const budgetBatas = document.querySelector("#budget-batas");
@@ -404,6 +407,87 @@ daftarTransaksi.addEventListener("click", (event) => {
 tombolBatal.addEventListener("click", () => {
   selesaiEdit();
   pesan.textContent = "";
+});
+
+function eksporData() {
+  const data = {
+    transaksi: state.transaksi,
+    uangBulanan: state.uangBulanan,
+    budget: state.budget
+  };
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const tautan = document.createElement("a");
+  tautan.href = url;
+  tautan.download = `uang-kos-${hariIni()}.json`;
+  tautan.click();
+  URL.revokeObjectURL(url);
+
+  pesanBackup.textContent = "Data berhasil diekspor.";
+}
+
+function transaksiValid(item) {
+  return item !== null
+    && typeof item === "object"
+    && typeof item.id === "number"
+    && typeof item.tanggal === "string"
+    && item.tanggal !== ""
+    && (item.jenis === "pemasukan" || item.jenis === "pengeluaran")
+    && typeof item.kategori === "string"
+    && typeof item.nominal === "number"
+    && item.nominal > 0
+    && typeof item.catatan === "string";
+}
+
+function dataImporValid(data) {
+  if (!data || !Array.isArray(data.transaksi)) return false;
+  if (!data.transaksi.every(transaksiValid)) return false;
+
+  const budget = data.budget || {};
+  if (Array.isArray(budget)) return false;
+  return Object.values(budget).every((batas) => typeof batas === "number" && batas > 0);
+}
+
+function imporData(teks) {
+  let data = null;
+  try {
+    data = JSON.parse(teks);
+  } catch (error) {
+    data = null;
+  }
+
+  if (!dataImporValid(data)) {
+    pesanBackup.textContent = "File tidak valid, data tidak diubah.";
+    return;
+  }
+
+  if (!confirm("Data saat ini akan diganti dengan isi file. Lanjutkan?")) return;
+
+  state.transaksi = data.transaksi;
+  state.uangBulanan = Number(data.uangBulanan) > 0 ? Number(data.uangBulanan) : 0;
+  state.budget = data.budget || {};
+  simpanData();
+
+  inputUangBulanan.value = state.uangBulanan > 0 ? state.uangBulanan : "";
+  selesaiEdit();
+  render(state);
+  pesanBackup.textContent = `Berhasil mengimpor ${state.transaksi.length} transaksi.`;
+}
+
+tombolEkspor.addEventListener("click", eksporData);
+
+fileImpor.addEventListener("change", () => {
+  const file = fileImpor.files[0];
+  if (!file) return;
+
+  const pembaca = new FileReader();
+  pembaca.addEventListener("load", () => {
+    imporData(pembaca.result);
+    fileImpor.value = "";
+  });
+  pembaca.readAsText(file);
 });
 
 function isiOpsiKategori(pilihan) {

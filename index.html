@@ -171,6 +171,20 @@
 
       <ul id="daftar-transaksi"></ul>
     </section>
+
+    <section class="kartu">
+      <h2>Backup Data</h2>
+      <div class="baris-form">
+        <button type="button" id="tombol-ekspor">Ekspor ke JSON</button>
+      </div>
+
+      <div class="baris-form">
+        <label for="file-impor">Impor dari file JSON</label>
+        <input type="file" id="file-impor" accept=".json,application/json">
+      </div>
+
+      <p id="pesan-backup" role="status"></p>
+    </section>
   </main>
 
   <script src="app.js"></script>
