@@ -111,6 +111,44 @@
 
     <section class="kartu">
       <h2>Daftar Transaksi</h2>
+
+      <form id="form-filter" class="filter">
+        <div class="baris-form">
+          <label for="filter-jenis">Jenis</label>
+          <select id="filter-jenis">
+            <option value="semua">Semua</option>
+            <option value="pemasukan">Pemasukan</option>
+            <option value="pengeluaran">Pengeluaran</option>
+          </select>
+        </div>
+
+        <div class="baris-form">
+          <label for="filter-kategori">Kategori</label>
+          <select id="filter-kategori">
+            <option value="semua">Semua</option>
+          </select>
+        </div>
+
+        <div class="baris-form">
+          <label for="filter-dari">Dari tanggal</label>
+          <input type="date" id="filter-dari">
+        </div>
+
+        <div class="baris-form">
+          <label for="filter-sampai">Sampai tanggal</label>
+          <input type="date" id="filter-sampai">
+        </div>
+
+        <div class="baris-form">
+          <label for="filter-kata">Cari catatan</label>
+          <input type="search" id="filter-kata" placeholder="Kata kunci">
+        </div>
+
+        <div class="baris-form">
+          <button type="button" id="tombol-reset-filter">Reset Filter</button>
+        </div>
+      </form>
+
       <ul id="daftar-transaksi"></ul>
     </section>
   </main>

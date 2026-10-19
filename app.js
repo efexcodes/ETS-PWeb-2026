@@ -4,7 +4,8 @@ const KUNCI_UANG_BULANAN = "uangBulanan";
 let state = {
   transaksi: [],
   uangBulanan: 0,
-  idEdit: null
+  idEdit: null,
+  filter: { jenis: "semua", kategori: "semua", dari: "", sampai: "", kata: "" }
 };
 
 const form = document.querySelector("#form-transaksi");
@@ -13,6 +14,13 @@ const inputJenis = document.querySelector("#jenis");
 const inputKategori = document.querySelector("#kategori");
 const inputNominal = document.querySelector("#nominal");
 const inputCatatan = document.querySelector("#catatan");
+const formFilter = document.querySelector("#form-filter");
+const filterJenis = document.querySelector("#filter-jenis");
+const filterKategori = document.querySelector("#filter-kategori");
+const filterDari = document.querySelector("#filter-dari");
+const filterSampai = document.querySelector("#filter-sampai");
+const filterKata = document.querySelector("#filter-kata");
+const tombolResetFilter = document.querySelector("#tombol-reset-filter");
 const judulForm = document.querySelector("#judul-form");
 const tombolSimpan = document.querySelector("#tombol-simpan");
 const tombolBatal = document.querySelector("#tombol-batal");
@@ -124,18 +132,31 @@ function buatItemTransaksi(item) {
   return li;
 }
 
+function cocokFilter(item, filter) {
+  if (filter.jenis !== "semua" && item.jenis !== filter.jenis) return false;
+  if (filter.kategori !== "semua" && item.kategori !== filter.kategori) return false;
+  if (filter.dari && item.tanggal < filter.dari) return false;
+  if (filter.sampai && item.tanggal > filter.sampai) return false;
+  if (filter.kata && !item.catatan.toLowerCase().includes(filter.kata)) return false;
+  return true;
+}
+
 function renderDaftar(data) {
   daftarTransaksi.innerHTML = "";
 
-  if (data.transaksi.length === 0) {
+  const hasil = data.transaksi.filter((item) => cocokFilter(item, data.filter));
+
+  if (hasil.length === 0) {
     const kosong = document.createElement("li");
     kosong.className = "kosong";
-    kosong.textContent = "Belum ada transaksi.";
+    kosong.textContent = data.transaksi.length === 0
+      ? "Belum ada transaksi."
+      : "Tidak ada transaksi yang cocok dengan filter.";
     daftarTransaksi.appendChild(kosong);
     return;
   }
 
-  const terurut = [...data.transaksi].sort((a, b) => {
+  const terurut = hasil.sort((a, b) => {
     return b.tanggal.localeCompare(a.tanggal) || b.id - a.id;
   });
 
@@ -288,6 +309,33 @@ tombolBatal.addEventListener("click", () => {
   pesan.textContent = "";
 });
 
+function isiOpsiFilterKategori() {
+  for (const opsi of inputKategori.options) {
+    const salinan = document.createElement("option");
+    salinan.value = opsi.value;
+    salinan.textContent = opsi.textContent;
+    filterKategori.appendChild(salinan);
+  }
+}
+
+function bacaFilter() {
+  state.filter = {
+    jenis: filterJenis.value,
+    kategori: filterKategori.value,
+    dari: filterDari.value,
+    sampai: filterSampai.value,
+    kata: filterKata.value.trim().toLowerCase()
+  };
+  renderDaftar(state);
+}
+
+formFilter.addEventListener("input", bacaFilter);
+
+tombolResetFilter.addEventListener("click", () => {
+  formFilter.reset();
+  bacaFilter();
+});
+
 function validasiTransaksi(item) {
   const daftarPesan = [];
 
@@ -356,6 +404,7 @@ form.addEventListener("submit", (event) => {
 });
 
 muatData();
+isiOpsiFilterKategori();
 inputUangBulanan.value = state.uangBulanan > 0 ? state.uangBulanan : "";
 kosongkanForm();
 render(state);

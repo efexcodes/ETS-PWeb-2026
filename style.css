@@ -166,6 +166,21 @@ button:focus-visible {
   display: none;
 }
 
+.filter {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.filter .baris-form {
+  margin-bottom: 0;
+}
+
+.filter .baris-form:last-child {
+  justify-content: flex-end;
+}
+
 #daftar-transaksi {
   list-style: none;
   margin: 0;
@@ -230,7 +245,8 @@ button:focus-visible {
   gap: 0.5rem;
 }
 
-#tombol-batal {
+#tombol-batal,
+#tombol-reset-filter {
   background-color: transparent;
   color: var(--warna-teks);
   border-color: var(--warna-garis);
