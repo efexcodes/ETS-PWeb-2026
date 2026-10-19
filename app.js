@@ -1,3 +1,5 @@
+const KUNCI_TRANSAKSI = "transaksi";
+
 let state = {
   transaksi: []
 };
@@ -10,6 +12,21 @@ const inputNominal = document.querySelector("#nominal");
 const inputCatatan = document.querySelector("#catatan");
 const pesan = document.querySelector("#pesan");
 const daftarTransaksi = document.querySelector("#daftar-transaksi");
+
+function simpanData() {
+  localStorage.setItem(KUNCI_TRANSAKSI, JSON.stringify(state.transaksi));
+}
+
+function muatData() {
+  try {
+    const data = JSON.parse(localStorage.getItem(KUNCI_TRANSAKSI));
+    if (Array.isArray(data)) {
+      state.transaksi = data;
+    }
+  } catch (error) {
+    state.transaksi = [];
+  }
+}
 
 function formatRupiah(angka) {
   return `Rp ${angka.toLocaleString("id-ID")}`;
@@ -94,12 +111,14 @@ function renderDaftar(data) {
 
 function tambahTransaksi(item) {
   state.transaksi.push(item);
+  simpanData();
   renderDaftar(state);
   pesan.textContent = "Transaksi berhasil ditambahkan.";
 }
 
 function hapusTransaksi(id) {
   state.transaksi = state.transaksi.filter((item) => item.id !== id);
+  simpanData();
   renderDaftar(state);
   pesan.textContent = "Transaksi dihapus.";
 }
@@ -129,5 +148,6 @@ form.addEventListener("submit", (event) => {
   kosongkanForm();
 });
 
+muatData();
 kosongkanForm();
 renderDaftar(state);
