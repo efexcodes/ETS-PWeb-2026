@@ -103,6 +103,33 @@ button:focus-visible {
   outline: 3px solid #a7beae;
 }
 
+.ringkasan {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 1rem;
+}
+
+.label {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--warna-redup);
+}
+
+.angka {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: bold;
+}
+
+.angka-masuk {
+  color: var(--warna-sukses);
+}
+
+.angka-keluar,
+.negatif {
+  color: var(--warna-bahaya);
+}
+
 #daftar-transaksi {
   list-style: none;
   margin: 0;

@@ -12,6 +12,9 @@ const inputNominal = document.querySelector("#nominal");
 const inputCatatan = document.querySelector("#catatan");
 const pesan = document.querySelector("#pesan");
 const daftarTransaksi = document.querySelector("#daftar-transaksi");
+const teksPemasukan = document.querySelector("#total-pemasukan");
+const teksPengeluaran = document.querySelector("#total-pengeluaran");
+const teksSaldo = document.querySelector("#saldo");
 
 function simpanData() {
   localStorage.setItem(KUNCI_TRANSAKSI, JSON.stringify(state.transaksi));
@@ -109,17 +112,42 @@ function renderDaftar(data) {
   }
 }
 
+function hitungRingkasan(data) {
+  const pemasukan = data.transaksi
+    .filter((item) => item.jenis === "pemasukan")
+    .reduce((total, item) => total + item.nominal, 0);
+
+  const pengeluaran = data.transaksi
+    .filter((item) => item.jenis === "pengeluaran")
+    .reduce((total, item) => total + item.nominal, 0);
+
+  return { pemasukan, pengeluaran, saldo: pemasukan - pengeluaran };
+}
+
+function renderRingkasan(data) {
+  const ringkasan = hitungRingkasan(data);
+  teksPemasukan.textContent = formatRupiah(ringkasan.pemasukan);
+  teksPengeluaran.textContent = formatRupiah(ringkasan.pengeluaran);
+  teksSaldo.textContent = formatRupiah(ringkasan.saldo);
+  teksSaldo.classList.toggle("negatif", ringkasan.saldo < 0);
+}
+
+function render(data) {
+  renderRingkasan(data);
+  renderDaftar(data);
+}
+
 function tambahTransaksi(item) {
   state.transaksi.push(item);
   simpanData();
-  renderDaftar(state);
+  render(state);
   pesan.textContent = "Transaksi berhasil ditambahkan.";
 }
 
 function hapusTransaksi(id) {
   state.transaksi = state.transaksi.filter((item) => item.id !== id);
   simpanData();
-  renderDaftar(state);
+  render(state);
   pesan.textContent = "Transaksi dihapus.";
 }
 
@@ -150,4 +178,4 @@ form.addEventListener("submit", (event) => {
 
 muatData();
 kosongkanForm();
-renderDaftar(state);
+render(state);
